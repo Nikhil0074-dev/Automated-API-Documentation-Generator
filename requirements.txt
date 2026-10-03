@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+PyYAML
+openapi-spec-validator
+httpx
+pytest
