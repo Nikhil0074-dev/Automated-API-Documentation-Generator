@@ -1,0 +1,38 @@
+# Copy to config/documentation.yaml to customise. If that file is absent,
+# this example file is used.
+project:
+  spec_path: openapi/openapi.json   # spec consumed by validate/build scripts
+  output_dir: dist
+
+# Written into the generated spec (replaces servers declared by the app).
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: http://localhost:8000
+    description: Local development
+
+docs:
+  # "Try it out" sends real requests from the visitor's browser. Keep disabled
+  # for public documentation unless the servers are safe to call.
+  try_it_out: false
+  default_renderer: swagger         # swagger | redoc
+  base_url: null                    # base URL used in code examples (default: first server)
+
+examples:
+  languages: [curl, python, javascript, typescript]
+
+# Validation rules: error (fails the build) | warn (reported only) | off
+rules:
+  info-description: warn
+  servers-defined: warn
+  operation-id: error
+  operation-id-unique: error
+  operation-summary: error
+  operation-description: warn
+  operation-tags: error
+  parameter-description: warn
+  success-response: error
+  security-applied: warn      # write operations without security when schemes exist
+  security-unused: warn       # declared security schemes never used
+  external-ref: warn
+write_methods: [post, put, patch, delete]
