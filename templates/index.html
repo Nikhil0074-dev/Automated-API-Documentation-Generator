@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} {{version}} - API documentation</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css">
+<style>
+:root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6670;--line:#d8dee4;--accent:#0b6bcb;--card:#f6f8fa}
+:root:not([data-theme="light"]){color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1419;--fg:#e6edf3;--muted:#9aa7b2;--line:#2b333c;--accent:#58a6ff;--card:#161b22}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+nav{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--card)}
+nav strong{margin-right:auto}nav a{color:var(--accent);text-decoration:none}nav a:hover{text-decoration:underline}
+main{max-width:1000px;margin:0 auto;padding:20px}
+
+.swagger-ui .topbar{display:none}
+</style>
+</head>
+<body>
+<nav>
+  <strong>{{title}} &middot; {{version}} (API {{api_version}})</strong>
+  <a href="index.html">Swagger UI</a>
+  <a href="redoc.html">ReDoc</a>
+  <a href="examples.html">Code examples</a>
+  <a href="changes.html">Changes</a>
+  <a href="openapi.json">openapi.json</a>
+  <a href="openapi.yaml">openapi.yaml</a>
+  <a href="{{root}}">All versions</a>
+</nav>
+<div id="swagger-ui"></div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+<script>
+const spec = {{spec_json}};
+window.ui = SwaggerUIBundle({
+  spec: spec,
+  dom_id: "#swagger-ui",
+  deepLinking: true,
+  filter: true,
+  supportedSubmitMethods: {{submit_methods}},
+  presets: [SwaggerUIBundle.presets.apis]
+});
+</script>
+</body>
+</html>

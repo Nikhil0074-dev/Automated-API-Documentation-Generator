@@ -1,0 +1,17 @@
+import requests
+
+BASE_URL = "{{base_url}}"
+
+
+def {{func_name}}():
+    """{{summary}}"""
+    response = requests.{{method_lower}}(
+        f"{BASE_URL}{{path}}",
+{{extra_args}}        timeout=30,
+    )
+    response.raise_for_status()
+{{return_stmt}}
+
+
+if __name__ == "__main__":
+    print({{func_name}}())
