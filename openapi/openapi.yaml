@@ -1,0 +1,376 @@
+openapi: 3.1.0
+info:
+  title: Example Product API
+  description: 'API for managing products.
+
+
+    Read operations are public. Write operations require an API key sent in the `X-API-Key` header.'
+  license:
+    name: MIT
+    identifier: MIT
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      tags:
+      - products
+      summary: List products
+      description: Return a paginated list of products, optionally filtered by stock status.
+      operationId: listProducts
+      parameters:
+      - name: skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          description: Number of products to skip.
+          default: 0
+          title: Skip
+        description: Number of products to skip.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          description: Maximum number of products to return.
+          default: 20
+          title: Limit
+        description: Maximum number of products to return.
+      - name: in_stock
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          description: Filter by stock availability.
+          title: In Stock
+        description: Filter by stock availability.
+      responses:
+        '200':
+          description: Product list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+                title: Response Listproducts
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - products
+      summary: Create a product
+      description: Create a new product. Requires a valid API key.
+      operationId: createProduct
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '201':
+          description: Product created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /products/{product_id}:
+    get:
+      tags:
+      - products
+      summary: Get a product
+      description: Return a single product by its identifier.
+      operationId: getProduct
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          description: Unique product identifier.
+          title: Product Id
+        description: Unique product identifier.
+      responses:
+        '200':
+          description: Product retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - products
+      summary: Replace a product
+      description: Replace all fields of an existing product. Requires a valid API key.
+      operationId: updateProduct
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          description: Unique product identifier.
+          title: Product Id
+        description: Unique product identifier.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '200':
+          description: Product updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - products
+      summary: Delete a product
+      description: Permanently delete a product. Requires a valid API key.
+      operationId: deleteProduct
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          description: Unique product identifier.
+          title: Product Id
+        description: Unique product identifier.
+      responses:
+        '204':
+          description: Product deleted successfully.
+        '401':
+          description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          description: Human-readable error message.
+          examples:
+          - Product not found
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+      description: Standard error body returned by the API.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Product:
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+          description: Human-readable product name.
+          examples:
+          - Mechanical Keyboard
+        description:
+          anyOf:
+          - type: string
+            maxLength: 1000
+          - type: 'null'
+          title: Description
+          description: Optional long-form product description.
+        price:
+          type: number
+          exclusiveMinimum: 0.0
+          title: Price
+          description: Unit price in the store currency. Must be greater than zero.
+          examples:
+          - 89.99
+        in_stock:
+          type: boolean
+          title: In Stock
+          description: Whether the product can currently be purchased.
+          default: true
+        id:
+          type: integer
+          minimum: 1.0
+          title: Id
+          description: Unique product identifier.
+          examples:
+          - 1
+      type: object
+      required:
+      - name
+      - price
+      - id
+      title: Product
+      description: A product stored in the catalogue.
+      examples:
+      - description: Hot-swappable 75% keyboard with brown switches.
+        in_stock: true
+        name: Mechanical Keyboard
+        price: 89.99
+    ProductCreate:
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+          description: Human-readable product name.
+          examples:
+          - Mechanical Keyboard
+        description:
+          anyOf:
+          - type: string
+            maxLength: 1000
+          - type: 'null'
+          title: Description
+          description: Optional long-form product description.
+        price:
+          type: number
+          exclusiveMinimum: 0.0
+          title: Price
+          description: Unit price in the store currency. Must be greater than zero.
+          examples:
+          - 89.99
+        in_stock:
+          type: boolean
+          title: In Stock
+          description: Whether the product can currently be purchased.
+          default: true
+      type: object
+      required:
+      - name
+      - price
+      title: ProductCreate
+      description: Payload used to create or fully replace a product.
+      examples:
+      - description: Hot-swappable 75% keyboard with brown switches.
+        in_stock: true
+        name: Mechanical Keyboard
+        price: 89.99
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: API key sent in the `X-API-Key` header. Required for write operations.
+      in: header
+      name: X-API-Key
+tags:
+- name: products
+  description: Create, read, update and delete products.
+servers:
+- url: https://api.example.com
+  description: Production
+- url: http://localhost:8000
+  description: Local development
